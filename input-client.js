@@ -8,6 +8,9 @@ let source = null
 let sub = null
 let connection = null
 
+const randomProviders = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+const randomSymbols = ['USD', 'BGN', 'GBR', 'YEN']
+
 socket.on('connect', () => {
     console.log('Connected to server !')
     console.log('Starting Feed !!!')
@@ -34,23 +37,7 @@ socket.on('disconnect', () => {
 
 //create random feed
 const PriceFeedFactory = (dataInterval) => {
-    const randomPricePoint = () => {
-        return {
-            value: {
-
-                buyPrice: Math.random() * (250 - 185) + 185,
-                sellPrice: Math.random() * (250 - 185) + 185,
-            },
-            timestamp: Date.now(),
-            symbol: getRandomElement(randomSymbols),
-            providerName: getRandomElement(randomProviders)
-        }
-    };
-    const getRandomElement = (arr) => {
-        return arr[Math.floor((Math.random() * arr.length))]
-    }
-    const randomProviders = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
-    const randomSymbols = ['USD', 'BGN', 'GBR', 'YEN']
+    
     //create
     //use random time interval instead of fixed
     return Rx.interval(Math.random() * (500 - 200) + 200)
@@ -58,4 +45,21 @@ const PriceFeedFactory = (dataInterval) => {
             rxOps.map(x => randomPricePoint()),
             rxOps.publish()
         )
+}
+
+const randomPricePoint = () => {
+    return {
+        value: {
+
+            buyPrice: Math.random() * (250 - 185) + 185,
+            sellPrice: Math.random() * (250 - 185) + 185,
+        },
+        timestamp: Date.now(),
+        symbol: getRandomElement(randomSymbols),
+        providerName: getRandomElement(randomProviders)
+    }
+}
+
+const getRandomElement = (arr) => {
+    return arr[Math.floor((Math.random() * arr.length))]
 }
