@@ -2,8 +2,9 @@ const Rx = require('rxjs')
 const rxOps = require('rxjs/operators')
 const socket = require('socket.io-client')('http://localhost:3000')
 
-console.log('connecting ...')
+console.log('Connecting ...')
 
+let source
 let sub
 let connection
 
@@ -14,7 +15,6 @@ socket.on('connect', () => {
     connection = source.connect()
     sub = source.subscribe(
         (data) => {
-            console.log(`Emmiting feed data :: ${JSON.stringify(data)}`)
             socket.emit('feed', data)
         },
         (error) => console.error(error),
@@ -22,21 +22,20 @@ socket.on('connect', () => {
     )
 })
 
-//socket.on('event', function(data){});
-
 socket.on('disconnect', () => {
     console.error('Disconnected from server !')
     connection.unsubscribe()
     sub.unsubscribe()
+    source = null
     console.log('Stream disconnected and unsubscribed !')
 })
 
+//create random feed
 const PriceFeedFactory = (dataInterval) => {
-    //create random type PricePoint = Timestamp<PriceOffer>
     const randomPricePoint = () => {
         return {
             value: {
-                //Math.random() * (max - min) + min;
+
                 buyPrice: Math.random() * (250 - 185) + 185,
                 sellPrice: Math.random() * (250 - 185) + 185,
             },
@@ -46,20 +45,15 @@ const PriceFeedFactory = (dataInterval) => {
         }
     };
     const getRandomElement = (arr) => {
-        return arr[Math.floor((Math.random()*arr.length))];
+        return arr[Math.floor((Math.random() * arr.length))]
     }
     const randomProviders = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
     const randomSymbols = ['USD', 'BGN', 'GBR', 'YEN']
     //create
-    const pp$ = Rx.interval(dataInterval)
+    //use random time interval instead of fixed
+    return Rx.interval(Math.random() * (500 - 200) + 200)
         .pipe(
             rxOps.map(x => randomPricePoint()),
             rxOps.publish()
-        );
-    //should I connect immediately ?
-    //pp$.connect()
-    //log
-    console.log('pp$ created :: ', pp$)
-    //return
-    return pp$
+        )
 }
