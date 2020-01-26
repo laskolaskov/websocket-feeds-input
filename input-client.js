@@ -4,9 +4,9 @@ const socket = require('socket.io-client')('http://localhost:3000')
 
 console.log('Connecting ...')
 
-let source
-let sub
-let connection
+let source = null
+let sub = null
+let connection = null
 
 socket.on('connect', () => {
     console.log('Connected to server !')
@@ -24,10 +24,12 @@ socket.on('connect', () => {
 
 socket.on('disconnect', () => {
     console.error('Disconnected from server !')
-    connection.unsubscribe()
-    sub.unsubscribe()
-    source = null
-    console.log('Stream disconnected and unsubscribed !')
+    if (source) {
+        connection.unsubscribe()
+        sub.unsubscribe()
+        source = null
+        console.log('Stream disconnected and unsubscribed !')
+    }
 })
 
 //create random feed
